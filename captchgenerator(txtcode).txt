@@ -1,0 +1,39 @@
+# installing pakage
+! pip install pillow
+
+# importing packages
+from PIL import Image, ImageDraw, ImageFont
+import random
+import string
+
+#
+def generate_captcha(text, font_path='arial.ttf', font_size=36):
+    width, height = 200, 100
+    image = Image.new('RGB', (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    try:
+        font = ImageFont.truetype(font_path, font_size)
+    except IOError:
+        font = ImageFont.load_default()
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    position = ((width - text_width) // 2, (height - text_height) // 2)
+    draw.text(position, text, font=font, fill=(0, 0, 0))
+    for _ in range(random.randint(100, 500)):
+        x = random.randint(0, width - 1)
+        y = random.randint(0, height - 1)
+        draw.point((x, y), fill=(0, 0, 0))
+    return image
+
+#
+def generate_random_text(length=5):
+     characters = string.ascii_uppercase + string.digits
+     return ''.join(random.choice(characters) for _ in range(length))
+
+#
+if __name__ == "__main__":
+    captcha_text = generate_random_text()
+    print(f"Generated CAPTCHA text: {captcha_text}")
+    captcha_image = generate_captcha(captcha_text)
+    captcha_image.save('captcha.png')
+    print("CAPTCHA image saved as 'captcha.png'")
